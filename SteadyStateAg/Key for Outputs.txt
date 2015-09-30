@@ -1,0 +1,10 @@
+Key for Outputs
+xhat	dimensionless downstream coordinate
+x	downstream coordinate [km]
+Qtbf	Volume bed material transport during flood stage [m3/s]
+Sl	Bed slope
+ηhat	dimensionless deviatoric bed elevation
+ηdev	deviatoric bed elevation [m]
+Bbf	Bankfull channel width [m]
+Hbf	Bankfull channel depth [m]
+eta	Bed elevation [m]

@@ -1,0 +1,8 @@
+Key for Outputs
+H	water depth [m]
+zeta	height above bed surface relative to the water surface height
+uno	normalized velocity without stratification
+cno	normalized concentration without stratification
+un	normalized velocity with stratification
+cn	normalized concentration with stratification
+Ri	gradient Richardson number

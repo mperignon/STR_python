@@ -1,0 +1,8 @@
+Key for Outputs
+x	downstream coordinate [m]
+H	water depth above bed surface [m]
+U	flow velocity [m/s]
+Fr	Froude number
+tau(b)	shear stress on the bed surface [N/m2]
+eta	bed surface elevation [m]
+ksi	water surface elevation [m]

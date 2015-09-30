@@ -1,0 +1,13 @@
+Key for Outputs
+x	downstream coordinate [m]
+Sl	slope of the bed surface
+H	water depth [m]
+tausg	shear stress on the bed surface [N/m2]
+eta	bed surface elevation [m]
+qbT	bedload transport rate [m2/s]
+qbf	upstream feed rate [tons/year]
+dsg	geometric mean grain size on the bed surface [mm]
+d90s	the diameter such that 90% of the bed surface is finer [mm]
+pfeed	   GSD of the feed
+Ffs	GSD of the substrate
+Ff	GSD of the final surface

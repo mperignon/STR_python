@@ -1,0 +1,6 @@
+Key for Outputs
+qbT		volume beload transport per unit width [m2/s]
+taug		shields number
+Dg		geometric mean [mm]
+sigmag   	geometric standard deviation
+Dx		diameter such that x% of the distribution is finer [mm]

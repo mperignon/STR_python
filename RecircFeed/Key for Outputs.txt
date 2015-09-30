@@ -1,0 +1,8 @@
+Key for Outputs
+x	dimensionless downstream coordinate
+eta	dimensionless bed elevation
+Sl	bed slope
+qbT	dimensionless bedload transport
+H	dimensionless water depth
+SNup	upstream end normalized slope
+SNdown	downstream end normalized slope

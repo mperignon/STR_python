@@ -1,0 +1,13 @@
+Key for Outputs
+qbT		volume beload transport per unit width [m2/s]
+taug*		shields number
+H		water depth [m]
+u*		shear velocity [m/s]
+Qwa		mean annual water discharge [m3/s]
+Dg		geometric mean [mm]
+sigmag   	geometric standard deviation
+Dx		diameter such that x% of the distribution is finer [mm]
+Qwr		mean water discharge for each range [m3/s]
+pQ		fraction of time in that range
+ustar		shear velocity on the range [m/s]
+taustar	shields number on the range

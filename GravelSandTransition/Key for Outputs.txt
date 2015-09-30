@@ -1,0 +1,8 @@
+Key for Outputs
+x	downstream coordinate [m]
+eta	bed elevation [m]
+Sl	bed slope
+qb	volume bedload transport per unit width [m2/s]
+H	water depth [m]
+tau	shear stress [N/m2]
+sgs	location of the gravel-sand transition [m]

@@ -1,0 +1,12 @@
+Key for Outputs
+x		downstream coordinate [m]
+eta		bed surface elevation [m]
+sss		reach of the alluvium top [m]
+sbb		reach of the alluvium bottom [m]
+etaup		upstream bed surface elevation [m]
+etatop		bed surface elevation of the top of the foreset [m]
+etabottom	bed surface elevation of the bottom of the foreset [m]
+Sl		bed slope
+qb		volume bedload transport per unit width [m^2/s]
+H		water depth [m]
+tau		shear stress [N/m^2]

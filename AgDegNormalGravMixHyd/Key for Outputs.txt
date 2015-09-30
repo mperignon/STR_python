@@ -1,0 +1,16 @@
+Key for Outputs
+x		downstream coordinate [m]
+Sl or S	    	slope of the bed surface
+H		water depth [m]
+tausg  	shear stress on the bed surface [N/m2]
+eta		bed surface elevation [m]
+qbT		bedload transport rate [m2/s]
+qbT/qbo   	bedload transport rate relative to the feed rate
+dsg		geometric mean grain on the bed surface [mm]
+dlg		geometric mean grain of the bedload [mm]
+d90s		grain size such that 90% of the sediment of the bed surface is 		finer [mm]
+qw		flow discharge [m2/s]
+qbo		feed rate 
+qbT (qb)    	bedload transport rate [m2/s]
+max		value for max flow
+end		value for end flow
