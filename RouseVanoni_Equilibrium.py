@@ -109,7 +109,7 @@ class RouseVanoni_Equilibrium(object):
             
     def finalize(self):
                 
-            print 'The Rouse-Vanoni Equilibrium profile is:'
-            print np.flipud(self._profile)
+        print 'The Rouse-Vanoni Equilibrium profile is:'
+        print np.flipud(self._profile)
             
             
