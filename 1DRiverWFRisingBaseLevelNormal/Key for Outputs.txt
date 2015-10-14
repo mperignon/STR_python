@@ -1,7 +1,0 @@
-Key for Outputs
-x		downstream coordinate [m]
-eta		bed surface elevation [m]
-Sl		bed slope
-qbT		volume bedload transport per unit width [m^2/s]
-Bbf		bankfull channel width [m]
-Hbf		bankfull water depth [m]

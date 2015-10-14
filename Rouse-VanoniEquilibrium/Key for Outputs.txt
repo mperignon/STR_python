@@ -1,8 +1,0 @@
-Key for Outputs
-b	height above the bed surface for the initial value
-H	water depth
-z	height above the bed surface of various points
-u*	shear velocity [m/s]
-vs	settling velocity of sediment [cm/s]
-cb	concentration of sediment at b point
-c	concentration of sediment at generic point

@@ -1,6 +1,0 @@
-Key for Outputs
-x	downstream coordinate (0 = initial bedrock-alluvial transition)
-eta	bed elevation
-Sl	bed slope
-qb	volume bedload transport per unit width
-H	water depth

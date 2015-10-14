@@ -1,8 +1,0 @@
-Grain Size (mm)			Percent Passing
-Grain Size (mm)			Percent Passing
-Grain Size (mm)			Percent Passing
-Grain Size (mm)			Percent Passing
-			.
-			.
-			.
-	    (no more than 100 values)

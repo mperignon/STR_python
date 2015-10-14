@@ -1,8 +1,0 @@
-Key for Outputs
-x	downstream coordinate [m]
-eta	bed surface elevation [m]
-Sl	slope of the bed surface
-H	water depth [m]
-tau	shear stress on bed surface [N/m2]
-qb	bed material load [m2/s]
-qb/qtf	load relative to initial amount

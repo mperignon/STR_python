@@ -1,8 +1,0 @@
-Key for Outputs
-qbT		volume beload transport per unit width [m2/s]
-taug*		shields number
-H		water depth [m]
-u*		shear velocity [m/s]
-Dg		geometric mean [mm]
-sigmag   	geometric standard deviation
-Dx		diameter such that x% of the distribution is finer [mm]

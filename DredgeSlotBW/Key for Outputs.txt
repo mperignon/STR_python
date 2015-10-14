@@ -1,8 +1,0 @@
-Key for Outputs
-x	downstream coordinate (m)
-eta	bed elevation (m)
-qb	volume bedload transport per unit width (tons/annum)
-qs	volume bedload transport per unit width due to skin friction (tons/annum)
-H	water depth (m)
-Hs	water depth due to skin friction (m)
-ksi	water surface elevation (m)

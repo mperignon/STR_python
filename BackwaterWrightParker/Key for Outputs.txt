@@ -1,6 +1,0 @@
-Key for Outputs
-x	downstream coordinate [m]
-H	water depth [m]
-Hs	water depth due to skin friction [m]
-eta	bed surface elevation [m]
-ksi	water surface elevation [m]
