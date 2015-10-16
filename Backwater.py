@@ -99,9 +99,10 @@ class Backwater(object):
         
         self.Fr = self.Uf  / sqrt( self.g_ * self.Hf )
         
+        
         self.taubf = (( ks**(1./3) * self.qw_**2 ) / \
                       ( self.alpha_**2 * self.g_ ))**(1./3) * self.S_**0.7 / \
-                      ( self.R * D50_ )
+                      ( self.R * self.D50_)
 
             
             
@@ -148,16 +149,16 @@ class Backwater(object):
 
     def update_surface(self, i, FnH, FnHp):
 
-        self.x[i] = self.x[i-1] - self.dx_
+#         self.x[i] = self.x[i-1] - self.dx_
         self.H[i] = self.H[i-1] - (0.5 * (FnH + FnHp) * self.dx_)
-        self.eta[i] = self.eta[i-1] + (self.S_ * self.dx_)
+#         self.eta[i] = self.eta[i-1] + (self.S_ * self.dx_)
 
 
     def Backwater_Calculator(self, Cf_fun):
 
-        self.x[0] = self.total_x_
+#         self.x[0] = self.total_x_
         self.H[0] = self.initdepth_
-        self.eta[0] = 0
+#         self.eta[0] = 0
         FnH, FnHp, Cf = self.update_vals_Fn(Cf_fun, 0)
         self.update_vals(0, Cf)
 
@@ -167,7 +168,14 @@ class Backwater(object):
             FnH, FnHp, Cf = self.update_vals_Fn(Cf_fun, i)
             self.update_vals(i, Cf)
 
-            
+    def set_surface(self):
+        
+        self.x[0] = self.total_x_
+        self.eta[0] = 0
+        
+        for i in range(1,self.nodes):
+            self.x[i] = self.x[i-1] - self.dx_
+            self.eta[i] = self.eta[i-1] + (self.S_ * self.dx_)
             
             
     ##########################################
@@ -176,6 +184,8 @@ class Backwater(object):
     def run(self): 
 
         self.get_critical_values()
+        
+        self.set_surface()
 
         if self.friction_ == "Manning":
             self.Manning_formulation()
