@@ -24,6 +24,7 @@ class Backwater(object):
 
         self._friction = friction
         self._output_file = output_file
+        self._flip_flag = False
 
         self._qw = float(qw)
         self._initdepth = float(initdepth)
@@ -129,6 +130,10 @@ class Backwater(object):
         Returns the x (distance) array
         """
         return self._x
+        
+    @distance.setter
+    def distance(self, new_x):
+        self._x = new_x
     
     @property
     def friction_method(self):
@@ -232,8 +237,9 @@ class Backwater(object):
         """
         
         if self._eta[0] > self._eta[-1]:
-            print 'flipping arrays'
+            self._flip_flag = True
             self._eta = np.flipud(self._eta)
+        if self._x[0] < self._x[-1]:
             self._x = np.flipud(self._x)
             
     ###################################################
@@ -298,7 +304,16 @@ class Backwater(object):
 
         if self._friction == "Chezy":
             self.Backwater_Calculator(self.Chezy_Cf)
-            
+        
+        self._H[self._H<0] = 0
         self._ksi = self._eta + self._H
+        
+        if self._flip_flag:
+        
+            self._eta = np.flipud(self._eta)
+            self._ksi = np.flipud(self._ksi)
+            self._H = np.flipud(self._H)
+            self._taub = np.flipud(self._taub)
+        
             
      
