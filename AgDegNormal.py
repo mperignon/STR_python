@@ -112,7 +112,7 @@ class AgDeg(object):
         self.tauult = (self.tau_c + (qtf / (self.alpha_t * sqrt(self.g * self.R * self.D_) *\
                         self.D_))**(1/self.nt)) / self.phi
 
-        if friction == 'Manning':
+        if self.friction == 'Manning':
 
             self.Sult = (self.R * self.D_ * self.tauult)**(10./7.) * \
                 (self.alpha_r**2 * self.B**2 * self.g / (self.Qf**2 * self.kc_**(1./3)))**(3./7.)

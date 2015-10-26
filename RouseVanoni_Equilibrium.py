@@ -98,7 +98,7 @@ class RouseVanoni_Equilibrium(object):
             
     def run(self):
     
-        assert self._vs, "Settling velocity must be set before running."
+        assert self._vs, "Settling velocity must be set before running. Use FallVelocity.py?"
         
         power = ((1-self._z)/self._z) / ((1-self._b)/self._b)
         self._C = np.power(power, self._vs/(self._kappa * self._u))

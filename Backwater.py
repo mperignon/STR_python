@@ -233,3 +233,5 @@ class Backwater(object):
                    delimiter = ",",
                    fmt = '%10.5f',
                    comments = '')
+                   
+        print 'Saved data to file', self.output_file_

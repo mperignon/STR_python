@@ -103,8 +103,8 @@ class FallVelocity(object):
     def finalize(self):
     
         if self._verbose:
-            print 'Reynolds Number: %.4g m/s' % self._Re
-            print 'Dimensionless fall velocity: %.4g m/s' % self._Rf
+            print 'Reynolds Number: %.4g' % self._Re
+            print 'Dimensionless fall velocity: %.4g' % self._Rf
             print 'Settling velocity: %.4g m/s' % self._vs
 
             

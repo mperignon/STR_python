@@ -40,7 +40,8 @@ class GSD_calculator(object):
         if verbose:
             print 'Initializing RouseVanoni_Equilibrium...'
             
-        self._datapts = None
+        self._datapts = [(4, 100), (2, 99), (1, 97), (0.5, 83.4), ...
+                         (0.25, 42), (0.125, 10), (0.062, 3.2), (0.031, 2)]
         
         self._D_g = None
         self._sigma_g = None
