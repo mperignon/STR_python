@@ -45,7 +45,7 @@ class Acronym(object):
 
     def run(self):
 
-        self.GSD_edges, self.GSD_surface = self.process_surface_GSD(GSD)
+        self.GSD_edges, self.GSD_surface = self.process_surface_GSD(self.GSD)
 
         self.pf_surface = self.GSD_edges['fractions']*100
         
@@ -65,7 +65,8 @@ class Acronym(object):
 
         calc_bedload_vals = self.calculate_bedload(self.GSD_surface,
                                                    self.D_g_surface,
-                                                   self.sigma_surface)
+                                                   self.sigma_surface,
+                                                   self.ustar)
         
         self.tau_star_surface = calc_bedload_vals[0]
         self.GSD_bedload = calc_bedload_vals[1]
@@ -147,12 +148,12 @@ class Acronym(object):
         return self.tau_star_surface
             
 
-    def get_bedload_discharge(self, GSD, Omega, phi_star, D_g):
+    def get_bedload_discharge(self, GSD, Omega, phi_star, D_g, ustar):
 
         if len(GSD) == 1:
 
             phi = Omega * phi_star
-            q_total = self.GG(phi) * 0.00218 * self.ustar**3 / (self.R * self.g)
+            q_total = self.GG(phi) * 0.00218 * ustar**3 / (self.R * self.g)
             q = q_total
 
         else:
@@ -164,7 +165,7 @@ class Acronym(object):
                 zs = GSD['diameters'][i] / D_g
                 phi = Omega * phi_star * zs**(-0.0951)
                 q[i] = GSD['fractions'][i] * self.GG(phi) * \
-                                0.00218 * self.ustar**3 / (self.R * self.g)
+                                0.00218 * ustar**3 / (self.R * self.g)
 
             q_total = sum(q)
 
@@ -215,16 +216,18 @@ class Acronym(object):
 
 
     def grain_statistics(self, GSD, centerpts, pf):
+        
+        fractions = np.diff(pf) / 100
 
-        psi_bar = sum(centerpts['psi'] * centerpts['fractions'])
+        psi_bar = sum(centerpts['psi'] * fractions)
         D_g = 2 ** psi_bar
 
         sigma = sqrt(sum((centerpts['psi'] - psi_bar)**2 * \
-            centerpts['fractions']))
+            fractions))
         sigma_g = 2 ** sigma
 
         i = 0
-        psi = np.zeros((len(GSD),))
+        psi = np.zeros((len(centerpts)+1,))
         
         for x in range(30,100,20):
 
@@ -295,13 +298,13 @@ class Acronym(object):
         return pf
 
 
-    def calculate_bedload(self, GSD, D_g, sigma):
+    def calculate_bedload(self, GSD, D_g, sigma, ustar):
         
         taursgo = 0.0386
         lowphi = 0.1
         hiphi = 2320.
 
-        tau_star = self.ustar**2 / (self.R * self.g * D_g/1000)
+        tau_star = ustar**2 / (self.R * self.g * D_g/1000)
         phi_star = tau_star / taursgo
 
         assert phi_star > lowphi, "Friction velocity is too low."
@@ -312,7 +315,8 @@ class Acronym(object):
         q, q_total = self.get_bedload_discharge(GSD,
                                                 Omega,
                                                 phi_star,
-                                                D_g)
+                                                D_g,
+                                                ustar)
         
 
         titles = ('psi', 'diameters', 'fractions')
