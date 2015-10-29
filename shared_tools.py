@@ -6,6 +6,19 @@ oo = np.array((1.011, 1.011, 1.01, 1.008, 1.004, 0.9997, 0.9903, 0.9789, 0.9567,
 
 so = np.array((0.8157, 0.8157, 0.8182, 0.8233, 0.8333, 0.8439, 0.8621, 0.8825, 0.9214, 0.9723, 1.025, 1.083, 1.13, 1.153, 1.196, 1.225, 1.25, 1.287, 1.313, 1.333, 1.352, 1.38, 1.403, 1.414, 1.426, 1.444, 1.458, 1.469, 1.48, 1.486, 1.49, 1.493, 1.497, 1.498, 1.499, 1.5))
 
+def CubicInterpolant(ym1, y, yp1, yp2, xm1, x, xp1, xp2, phisgo):
+
+    a1 = ym1;
+    a2 = (y - a1)/(x - xm1);
+    a3 = (yp1 - a1 - a2*(xp1 - xm1))/((xp1 - xm1)*(xp1 - x));
+    a4 = yp2 - a1 - a2*(xp2 - xm1) - a3*(xp2 - xm1)*(xp2 - x);
+    a4 = a4/((xp2 - xm1)*(xp2-x)*(xp2-xp1));
+
+    output = a1 + a2*(phisgo - xm1) + a3*(phisgo-xm1)*(phisgo - x) + a4*(phisgo - xm1)*(phisgo - x)*(phisgo - xp1);
+
+    return output
+
+
 def central_difference(array, dx, alpha = 0.5, right_boundary = None, left_boundary = None):
 
     return_array = np.zeros_like(array)
