@@ -44,7 +44,7 @@ class FallVelocity(object):
     """
 
     
-    def __init__(self, nu=1e-6, g=9.81, rho_w=1000., rho_s=2650., verbose=True):
+    def __init__(self, D = None, nu=1e-6, g=9.81, rho_w=1000., rho_s=2650., verbose=True):
         
         self._verbose = verbose
         if self._verbose:
@@ -57,7 +57,7 @@ class FallVelocity(object):
         
         self._R = (self._rho_s - self._rho_w) / self._rho_w
         
-        self._grain_size = None
+        self._grain_size = D / 1000.
         self._vs = None
         
 
@@ -86,6 +86,16 @@ class FallVelocity(object):
         assert self._vs, "A settling velocity has not been calculated "\
                         "because FallVelocity has not been run."
         return self._vs
+    
+    @property
+    def Reynolds_number(self):
+        
+        return self._Re
+    
+    @property
+    def dimensionless_fall_velocity(self):
+        
+        return self._Rf
         
         
             
@@ -126,9 +136,9 @@ class FallVelocity(object):
         y = (-3.76715) + (1.92944*x) - (0.09815*x*x) - \
             (0.00575*x*x*x) + (0.00056*x*x*x*x)
         
-        self._Rf = pow(pow(10,y) / self._Re, 0.33)
-        
-   
+        self._Rf = pow(pow(10,y) / self._Re, 1./3)
+
+
         
     def calculate_settling_velocity(self):
         
