@@ -38,22 +38,22 @@ class DeltaNorm(object):
         self.R = (float(density_sediment) - float(density_water)) / float(density_water)
 
         self.friction = friction
-        self.flood_discharge = flood_discharge
-        self.flood_intermittency = flood_intermittency
-        self.bedload_discharge_input = bedload_discharge_input
+        self.flood_discharge = float(flood_discharge)
+        self.flood_intermittency = float(flood_intermittency)
+        self.bedload_discharge_input = float(bedload_discharge_input)
         self.grain_size = grain_size / 1000.
-        self.coeff_Chezy = coeff_Chezy
-        self.exponent_load_relation = exponent_load_relation
-        self.critical_Shields_stress = critical_Shields_stress
-        self.basin_slope = basin_slope
-        self.domain_length = domain_length
-        self.foreset_slope = foreset_slope
-        self.bed_porosity = bed_porosity
-        self.coeff_Manning_ks = coeff_Manning_ks / 1000.
-        self.coeff_bedload = coeff_bedload
-        self.coeff_Manning = coeff_Manning
-        self.dx = dx
-        self.dt = dt__days * day_to_sec
+        self.coeff_Chezy = float(coeff_Chezy)
+        self.exponent_load_relation = float(exponent_load_relation)
+        self.critical_Shields_stress = float(critical_Shields_stress)
+        self.basin_slope = float(basin_slope)
+        self.domain_length = float(domain_length)
+        self.foreset_slope = float(foreset_slope)
+        self.bed_porosity = float(bed_porosity)
+        self.coeff_Manning_ks = float(coeff_Manning_ks) / 1000.
+        self.coeff_bedload = float(coeff_bedload)
+        self.coeff_Manning = float(coeff_Manning)
+        self.dx = float(dx)
+        self.dt = float(dt__days) * day_to_sec
         self.num_iterations = num_iterations
         self.print_step = print_step
 
