@@ -1,4 +1,5 @@
 from math import sqrt, log10, pow
+import json
         
 
 class FallVelocity(object):
@@ -44,21 +45,26 @@ class FallVelocity(object):
     """
 
     
-    def __init__(self, D = None, nu=1e-6, g=9.81, rho_w=1000., rho_s=2650., verbose=True):
+    def __init__(self, D = 0.1, nu=1e-6, g=9.81, rho_w=1000., rho_s=2650., verbose=False, save_output=True):
         
         self._verbose = verbose
+        self.save_output = save_output
         if self._verbose:
             print 'Initializing FallVelocity...'
         
-        self._nu = nu
-        self._g = g
+        self._nu = float(nu)
+        self._g = float(g)
         self._rho_w = float(rho_w)
         self._rho_s = float(rho_s)
         
         self._R = (self._rho_s - self._rho_w) / self._rho_w
         
         self._grain_size = D / 1000.
+        
+        # Outputs
         self._vs = None
+        self._Re = None
+        self._Rf = None
         
 
     @property
@@ -76,7 +82,10 @@ class FallVelocity(object):
         new_D : float
             New grain size in mm.
         """
-        self._grain_size = new_D / 1000     # convert from mm to m
+        self._grain_size = new_D / 1000.     # convert from mm to m
+        
+        if self._verbose:
+            print 'Grain size set'
             
     
     @property
@@ -90,10 +99,16 @@ class FallVelocity(object):
     @property
     def Reynolds_number(self):
         
+        assert self._Re, "A Reynolds number has not been calculated "\
+                        "because FallVelocity has not been run."
+        
         return self._Re
     
     @property
     def dimensionless_fall_velocity(self):
+        
+        assert self._Rf, "A dimensionless fall velocity has not been calculated "\
+                        "because FallVelocity has not been run."
         
         return self._Rf
         
@@ -116,6 +131,22 @@ class FallVelocity(object):
             print 'Reynolds Number: %.4g' % self._Re
             print 'Dimensionless fall velocity: %.4g' % self._Rf
             print 'Settling velocity: %.4g m/s' % self._vs
+            
+        if self.save_output:
+            
+            output_dict = {
+                'Reynolds_number' : self._Re,
+                'Dimensionless_fall_velocity' : self._Rf,
+                'Settling_velocity' : self._vs
+            }
+            
+            with open('output/FallVelocity.json', 'w') as f:
+                json.dump(output_dict, f, indent=4)
+                
+            
+            
+            
+            
 
             
     def calculate_Reynolds_number(self):
