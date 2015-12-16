@@ -1,0 +1,50 @@
+{
+    "0.0_years": {
+        "bed_elev_foreset_top__etatop": 2.9685502677312088, 
+        "bed_elev_upstream__etaup": 5.5224583019101701, 
+        "domain_length__sss": 10008.923248661344, 
+        "bed_elev_foreset_base__etabottom": 0.0, 
+        "bed_length__sbb": 10023.766
+    }, 
+    "2.5_years": {
+        "bed_elev_foreset_top__etatop": 4.2265697109535632, 
+        "bed_elev_upstream__etaup": 12.026828074900545, 
+        "domain_length__sss": 22585.333323758194, 
+        "bed_elev_foreset_base__etabottom": 0.0, 
+        "bed_length__sbb": 22606.466172312928
+    }, 
+    "5.0_years": {
+        "bed_elev_foreset_top__etatop": 3.9812840764123636, 
+        "bed_elev_upstream__etaup": 15.155110780330418, 
+        "domain_length__sss": 34483.248230092424, 
+        "bed_elev_foreset_base__etabottom": 0.0, 
+        "bed_length__sbb": 34503.154650474673
+    }, 
+    "7.5_years": {
+        "bed_elev_foreset_top__etatop": 3.7927322919927584, 
+        "bed_elev_upstream__etaup": 17.702486182618159, 
+        "domain_length__sss": 44658.466044455083, 
+        "bed_elev_foreset_base__etabottom": 0.0, 
+        "bed_length__sbb": 44677.429705915325
+    }, 
+    "10.0_years": {
+        "bed_elev_foreset_top__etatop": 3.6349980322483191, 
+        "bed_elev_upstream__etaup": 19.91237611000675, 
+        "domain_length__sss": 53749.605515781848, 
+        "bed_elev_foreset_base__etabottom": 0.0, 
+        "bed_length__sbb": 53767.780505943243
+    }, 
+    "12.5_years": {
+        "bed_elev_foreset_top__etatop": 3.495769976509699, 
+        "bed_elev_upstream__etaup": 22.944909177565098, 
+        "domain_length__sss": 62074.998418074058, 
+        "bed_elev_foreset_base__etabottom": 0.0, 
+        "bed_length__sbb": 62092.477267957009
+    }, 
+    "mass_balance": {
+        "sed_volume_final": 525101.07880578481, 
+        "mass_balance_error": 0.048368932822510417, 
+        "sed_volume_total_feed": 473364.00000000006, 
+        "sed_volume_initial": 26338.5
+    }
+}
