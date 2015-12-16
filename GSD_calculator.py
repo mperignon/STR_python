@@ -1,5 +1,6 @@
 from math import sqrt, log
 import numpy as np
+import json
 
 
 def pre_process_data(datapoints):
@@ -112,15 +113,20 @@ class GSD_calculator(object):
     """
     
     
-    def __init__(self, verbose = True):
+    def __init__(self, datapts = None, verbose = False, save_output = True):
         
         self._verbose = verbose
         if verbose:
             print 'Initializing RouseVanoni_Equilibrium...'
             
-        self._datapts = [(4, 100), (2, 99), (1, 97), (0.5, 83.4), 
-                         (0.25, 42), (0.125, 10), (0.062, 3.2), (0.031, 2)]
+        self._datapoints = datapts
         
+        if not datapts:
+            self._datapoints = [(4, 100), (2, 99), (1, 97), (0.5, 83.4), 
+                             (0.25, 42), (0.125, 10), (0.062, 3.2), (0.031, 2)]
+            
+        self.save_output = save_output
+
         self._D_g = None
         self._sigma_g = None
 
@@ -144,7 +150,6 @@ class GSD_calculator(object):
         """
         
         self._datapoints = new_dp
-        self._datapts = pre_process_data(self._datapoints)
         
         
 
@@ -162,9 +167,8 @@ class GSD_calculator(object):
         
          
     def run(self):
-    
-        assert self._datapts is not None, "Grain size data must be set before running."
         
+        self._datapts = pre_process_data(self._datapoints)
         self._D_g, self._sigma_g = grain_statistics(self._datapts)
         self.finalize()
         
@@ -175,10 +179,28 @@ class GSD_calculator(object):
         sorting = 'Well sorted'
         if self._sigma_g >= 1.6:
             sorting = 'Poorly sorted'
+            
+        pct_passing = self.characteristic_size([70,50,30])
     
-        print 'The statistics of the grain size distribution are:'
-        print 'Geometric mean:', self._D_g, 'mm'
-        print 'Standard deviation:', self._sigma_g, 'mm    [', sorting, ']'
+        if self._verbose:
+            print 'The statistics of the grain size distribution are:'
+            print 'Geometric mean:', self._D_g, 'mm'
+            print 'Standard deviation:', self._sigma_g, 'mm    [', sorting, ']'
+            
+        
+        if self.save_output:
+            
+            output_dict = {
+                'Geometric_mean' : self._D_g,
+                'Standard_deviation' : self._sigma_g,
+                'Sorting' : sorting,
+                'D_70' : pct_passing[0],
+                'D_50' : pct_passing[1],
+                'D_30' : pct_passing[2],
+            }
+            
+            with open('output/GSD_calculator_stats.json', 'w') as f:
+                json.dump(output_dict, f, indent=4, sort_keys=True)
         
         
     
@@ -227,13 +249,12 @@ class GSD_calculator(object):
         return datapts 
     
 
-    def characteristic_size(self, datapts, pct):
+    def characteristic_size(self, pct = None):
         '''
         Calculate characteristic size based on percent finer
     
         Input
         ------
-        datapts: nd array of grain size diameters and percent finers
         pct: percentage such that D_pct is the size such that pct percent
             of the sample is finer than D_pct (between 0 and 100)
         
@@ -245,12 +266,17 @@ class GSD_calculator(object):
         pct can be array-like, in which case D_x is the same length
         '''
         
+        if not pct:
+            pct = [70,50,30]
+        
         if type(pct) is int or type(pct) is float:
             pct = [pct]
             
         assert len(pct), 'pct is the wrong format!'
         
         D_x = []
+        
+        datapts = self._datapts
             
         for i in pct:
 
