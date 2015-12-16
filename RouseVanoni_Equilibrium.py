@@ -55,7 +55,12 @@ class RouseVanoni_Equilibrium(object):
     """
     
     
-    def __init__(self, b = 0.05, u_star = 0.2, verbose = True):
+    def __init__(self,
+                 b = 0.05,
+                 u_star = 0.2,
+                 settling_velocity = 0.003,
+                 verbose = False,
+                 save_output = True):
         
         self._verbose = verbose
         if verbose:
@@ -65,11 +70,13 @@ class RouseVanoni_Equilibrium(object):
         
         self._u = float(u_star)
         self._b = float(b)
-        self._vs = None
+        self._vs = float(settling_velocity)
         
         self._z = np.hstack((np.linspace(b,0.95,19), np.array([0.98,0.995,1.0])))
         self._C = np.zeros_like(self._z)
         self._profile = None
+        
+        self.save_output = save_output
         
         
     @property
@@ -97,8 +104,6 @@ class RouseVanoni_Equilibrium(object):
             
             
     def run(self):
-    
-        assert self._vs, "Settling velocity must be set before running. Use FallVelocity.py?"
         
         power = ((1-self._z)/self._z) / ((1-self._b)/self._b)
         self._C = np.power(power, self._vs/(self._kappa * self._u))
@@ -108,8 +113,25 @@ class RouseVanoni_Equilibrium(object):
             
             
     def finalize(self):
-                
-        print 'The Rouse-Vanoni Equilibrium profile is:'
-        print np.flipud(self._profile)
+        
+        if self.save_output:
+            
+            fields = ['z_over_H','C_over_Cb']
+
+            header = ', '.join(fields)
+
+            dtype = [(i, float) for i in fields]
+            self.data = np.empty(len(self._profile), dtype = dtype)
+            
+            profile = np.flipud(self._profile)
+
+            self.data['z_over_H'] = profile[:,0]
+            self.data['C_over_Cb'] = profile[:,1]
+
+            np.savetxt('output/RouseVanoni_profile.csv', self.data,
+                       header = header,
+                       delimiter = ",",
+                       fmt = '%10.5f',
+                       comments = '')
             
             
