@@ -2,6 +2,16 @@ import numpy as np
 from math import sqrt, log
 import shared_tools as tools
 
+from collections import OrderedDict
+import json
+
+class UnsortableList(list):
+    def sort(self, *args, **kwargs):
+        pass
+    
+class UnsortableOrderedDict(OrderedDict):
+    def items(self, *args, **kwargs):
+        return UnsortableList(OrderedDict.items(self, *args, **kwargs))
 
 class DeltaNorm(object):
     
@@ -27,9 +37,15 @@ class DeltaNorm(object):
                 dx = 500.,
                 dt__days = 0.182625,
                 num_iterations = 30000,
-                print_step = 5000.,
+                print_step = 5000,
                 density_sediment = 2650.,
-                density_water = 1000.):
+                density_water = 1000.,
+                verbose = False,
+                save_output = True):
+
+        
+        self.verbose = verbose
+        self.save_output = save_output
 
         
         day_to_sec = 60. * 60. * 24.
@@ -54,8 +70,8 @@ class DeltaNorm(object):
         self.coeff_Manning = float(coeff_Manning)
         self.dx = float(dx)
         self.dt = float(dt__days) * day_to_sec
-        self.num_iterations = num_iterations
-        self.print_step = print_step
+        self.num_iterations = int(num_iterations)
+        self.print_step = int(print_step)
 
 
         num_nodes = int(self.domain_length / self.dx) + 2
@@ -88,6 +104,20 @@ class DeltaNorm(object):
         
         self.sed_volume__init = self.calculate_mass_balance()
         
+        # Output
+        num_prints = int(num_iterations / self.print_step)
+        
+        self.fields = [str(i*self.dt*self.sec_to_year) + '_years' for i in range(0,num_iterations+1,int(print_step))]
+
+        dtype = [(i, float) for i in self.fields]
+        self.print_x = np.empty((num_nodes,), dtype = dtype)
+        self.print_eta = np.empty((num_nodes,), dtype = dtype)
+        self.print_qb = np.empty((num_nodes,), dtype = dtype)
+        self.print_H = np.empty((num_nodes,), dtype = dtype)
+        self.print_tau = np.empty((num_nodes,), dtype = dtype)
+        
+        self.output_dict = UnsortableOrderedDict()
+        
         
         
 
@@ -108,22 +138,34 @@ class DeltaNorm(object):
             self.eta, self.x = self.solve_Exner_equation(self.eta)
 
 
-            if (j+1) % self.print_step == 0:
-                print 'time:', time 
-
-
-
-                print '-' * 5, 'x', '-' * 5
-                print self.x
-                print '-' * 5, 'eta', '-' * 5
-                print self.eta
-                print '-' * 20
-                print 'sss:', self.domain_length
-                print 'sbb:', self.bed_length
-                print 'etaup:', self.eta_upstream
-                print '-' * 20
-                print '-' * 20
+            if (j) % self.print_step == 0:
                 
+                self.record_output(j)
+                
+                if self.verbose:
+                    print 'time:', time 
+
+                    
+    def record_output(self, j):
+        
+        ind = self.fields[int(j / self.print_step)]
+        
+        self.print_x[ind] = self.x
+        self.print_eta[ind] = self.eta
+        self.print_qb[ind] = self.bedload_discharge
+        self.print_H[ind] = self.water_depth
+        self.print_tau[ind] = self.shear_stress
+        
+        self.output_dict[ind] = {
+            
+            'domain_length__sss' : self.domain_length,
+            'bed_length__sbb' : self.bed_length,
+            'bed_elev_upstream__etaup' : self.eta_upstream,
+            'bed_elev_foreset_top__etatop' : self.eta[-2],
+            'bed_elev_foreset_base__etabottom' : self.eta[-1]
+            
+            }
+                    
                 
     def get_bed_slope(self, eta, domain_length):
     
@@ -169,22 +211,22 @@ class DeltaNorm(object):
         bed_length__change = (self.foreset_slope * domain_length__change  /
                               (self.foreset_slope - self.basin_slope))
 
-        bedload_discharge__div[0] = (self.bedload_discharge[1] - self.bedload_discharge_input) / (2 * self.dxbar)
+        self.bedload_discharge__div[0] = (self.bedload_discharge[1] - self.bedload_discharge_input) / (2 * self.dxbar)
 
-        eta__div[0] = (self.eta[1] - self.eta[0]) / self.dxbar
+        self.eta__div[0] = (self.eta[1] - self.eta[0]) / self.dxbar
 
 
         for i in range(1, len(self.eta)-2):
 
-            bedload_discharge__div[i] = (self.bedload_discharge[i+1] - self.bedload_discharge[i-1]) / (2 * self.dxbar)
+            self.bedload_discharge__div[i] = (self.bedload_discharge[i+1] - self.bedload_discharge[i-1]) / (2 * self.dxbar)
 
-            eta__div[i] = (self.eta[i+1] - self.eta[i-1]) / (2 * self.dxbar)
+            self.eta__div[i] = (self.eta[i+1] - self.eta[i-1]) / (2 * self.dxbar)
 
 
 
-        eta += (self.dt * (- self.flood_intermittency * bedload_discharge__div /
+        eta += (self.dt * (- self.flood_intermittency * self.bedload_discharge__div /
                 (self.domain_length * (1 - self.bed_porosity))) +
-                (self.xfbar * domain_length__change * eta__div * self.dt / self.domain_length))
+                (self.xfbar * domain_length__change * self.eta__div * self.dt / self.domain_length))
 
 
 
@@ -238,6 +280,39 @@ class DeltaNorm(object):
         self.mass_balance_error = abs(
             (self.sed_volume__final - self.sed_volume__init - self.sed_volume__feed) / 
              self.sed_volume__final)
+        
+        
+        if self.save_output:
+        
+            header = ', '.join(['x','eta','qb','H','tau'])
+
+            for i in range(len(self.fields)):
+
+                self.data = np.zeros((len(self.x),5))
+                self.data[:,0] = self.print_x[self.fields[i]]
+                self.data[:,1] = self.print_eta[self.fields[i]]
+                self.data[:,2] = self.print_qb[self.fields[i]]
+                self.data[:,3] = self.print_H[self.fields[i]]
+                self.data[:,4] = self.print_tau[self.fields[i]]
+
+                np.savetxt('output/DeltaNorm_' + self.fields[i] + '.csv', self.data,
+                               header = header,
+                               delimiter = ",",
+                               fmt = '%10.5f',
+                               comments = '')
+
+            self.output_dict['mass_balance'] = {
+
+                'sed_volume_initial' : self.sed_volume__init,
+                'sed_volume_final' : self.sed_volume__final,
+                'sed_volume_total_feed' : self.sed_volume__feed,
+                'mass_balance_error' : self.mass_balance_error
+
+                }
+
+
+            with open('output/DeltaNorm_stats.json', 'w') as f:
+                json.dump(self.output_dict, f, indent=4)
         
         
         

@@ -2,20 +2,25 @@ import numpy as np
 from math import sqrt, log, exp
 import FallVelocity
 
-class DensityStrat(object):
+class DensityStratification(object):
     
     def __init__(self,
                  grain_size = 0.1,
                  flow_depth = 1.,
                  roughness_height = 0.002,
                  shear_velocity = 0.02,
-                 skin_friction = 0.002,
+                 skin_friction = 0.02,
                  reference_concentration = None,
                  rho_w = 1000.,
                  rho_s = 2650.,
                  g = 9.81,
-                 kinematic_viscosity = 1e-6):
+                 kinematic_viscosity = 1e-6,
+                 verbose = False,
+                 save_output = True):
         
+        
+        self.verbose = verbose
+        self.save_output = save_output
 
         self.grain_size = float(grain_size)
         self.flow_depth = float(flow_depth)
@@ -78,10 +83,10 @@ class DensityStrat(object):
     def compute_UC_normal(self):
 
 
-        for i in range(1,len(eta)):
+        for i in range(1,len(self.eta)):
 
-            ku1 = 1 / (kappa * self.eta[i-1] * self.Fstrat[i-1])
-            ku2 = 1 / (kappa * self.eta[i] * self.Fstrat[i])
+            ku1 = 1 / (self.kappa * self.eta[i-1] * self.Fstrat[i-1])
+            ku2 = 1 / (self.kappa * self.eta[i] * self.Fstrat[i])
             kc1 = 1 / ((1.1 - self.eta[i-1]) * self.eta[i-1] * self.Fstrat[i-1])
             kc2 = 1 / ((1.1 - self.eta[i]) * self.eta[i] * self.Fstrat[i])
 
@@ -129,7 +134,7 @@ class DensityStrat(object):
             Aa = 0.00000013
 
             # use the relation of Garcia and Parker (1991)
-            Zgp = (ustar_skin_friction / vs) * Re**2./3
+            Zgp = (self.ustar_skin_friction / vs) * Re**2./3
             self.conc_ref = Aa * Zgp**5. / (1 + (Aa / 0.3) * Zgp**5.)
 
         # Ri = gradient Richardson number
@@ -167,4 +172,9 @@ class DensityStrat(object):
                 flag_converged = True
 
 
-        assert flag_converged, 'The calculation failed to converge.'   
+        assert flag_converged, 'The calculation failed to converge.'
+        
+        
+    def finalize():
+        
+        print 'finalize'

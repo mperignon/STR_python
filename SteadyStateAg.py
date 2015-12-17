@@ -7,7 +7,6 @@ import shared_tools as tools
 class SteadyStateAg(object):
     
     def __init__(self,
-                 
                  time = 10000.,
                  channel_length = 400000.,
                  floodplain_width = 8000.,
@@ -25,12 +24,15 @@ class SteadyStateAg(object):
                  coeff_Chezy = 25.,
                  density_water = 1000.,
                  density_sediment = 2650.,
-                 gravity = 9.81):
+                 gravity = 9.81,
+                 verbose = False,
+                 save_output = True):
 
         self.yr_to_sec = 60 * 60 * 24 * 365.25
         self.g = float(gravity)
         
-        
+        self.verbose = verbose
+        self.save_output = save_output
         
         self.channel_length = float(channel_length) # m
         self.floodplain_width = float(floodplain_width) # m
@@ -52,7 +54,13 @@ class SteadyStateAg(object):
         self.coeff_Engelund = float(coeff_Engelund)
         self.coeff_Chezy = float(coeff_Chezy)
         
-        self.time = float(time)
+        if type(time) is not list:
+        
+            self.time = [float(time)]
+            
+        else:
+            
+            self.time = [float(i) for i in time]
         
 
         self.R = (float(density_sediment) - float(density_water)) / float(density_water)
@@ -96,7 +104,45 @@ class SteadyStateAg(object):
         
         self.bed_elevation_change = self.channel_length * self.bed_elevation_change__nd
         
+   
+
+    def finalize(self):
         
+        
+        if self.save_output:
+        
+            fields = ['Position_normalized', 'Position', 'Bedload_discharge',
+                      'Bed_slope', 'Bed_elevation_change_nondimensional', 'Bed_elevation_change',
+                      'Bankfull_channel_width', 'Bankfull_channel_depth']
+            
+            for t in self.time:
+                
+                fields.append('Bed_elevation_' + str(t) + '_years')
+                
+
+            header = ', '.join(fields)
+
+            dtype = [(i, float) for i in fields]
+            self.data = np.empty(len(self.distance), dtype = dtype)
+
+            self.data['Position_normalized'] = self.distance__nd
+            self.data['Position'] = self.distance
+            self.data['Bedload_discharge'] = self.bedload_discharge
+            self.data['Bed_slope'] = self.bed_slope
+            self.data['Bed_elevation_change_nondimensional'] = self.bed_elevation_change__nd
+            self.data['Bed_elevation_change'] = self.bed_elevation_change
+            self.data['Bankfull_channel_width'] = self.bankfull_channel_width
+            self.data['Bankfull_channel_depth'] = self.bankfull_channel_depth
+            
+            for t in self.time:
+                
+                self.data['Bed_elevation_' + str(t) + '_years'] = self.get_bed_elevation(t)
+
+            np.savetxt('output/SteadyStateAg.csv', self.data,
+                       header = header,
+                       delimiter = ",",
+                       fmt = '%10.8f',
+                       comments = '')
         
         
     def get_bed_elevation(self, time):
@@ -140,7 +186,11 @@ class SteadyStateAg(object):
     @property
     def bed_elevation(self):
         
-        bed_elev = self.get_bed_elevation(self.time)
+        bed_elev = []
+        
+        for t in self.time:
+        
+            bed_elev.append(self.get_bed_elevation(t))
         
         return bed_elev
         
