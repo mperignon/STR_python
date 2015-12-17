@@ -1,7 +1,6 @@
 from math import sqrt
 import numpy as np
 import shared_tools as tools
-import matplotlib.pyplot as plt
 
 class AgDegNormalSub(object):
     
@@ -24,7 +23,8 @@ class AgDegNormalSub(object):
                  Cz = 22,
                  alpha_u = 0.5,
                  dt = 0.01,
-                 totalT = 10,
+                 totalT = 120,
+                 print_dt = 20,
                  g = 9.81,
                  rho_w = 1000,
                  rho_s = 2650,
@@ -32,7 +32,12 @@ class AgDegNormalSub(object):
                  channel_width = 25,
                  depositional_width = 25*60,
                  washload_fraction = 1.5,
-                 sinuosity = 1.5):
+                 sinuosity = 1.5,
+                 verbose = False,
+                 save_output = True):
+    
+        self.verbose = verbose
+        self.save_output = save_output
     
     
 
@@ -62,6 +67,7 @@ class AgDegNormalSub(object):
 
         self.dt = float(dt) # years
         self.totalT = float(totalT)
+        self.print_dt = float(print_dt)
 
         self.alpha_u = float(alpha_u) # upwind coefficient [1=full upwind, 0.5=central difference]
         self.phi = float(phi) # boundary shear stress due to skin friction (phi <= 1)
@@ -95,8 +101,39 @@ class AgDegNormalSub(object):
         
         
         self.subs1, self.subs2 = self.subsidence_terms()
+        
+        
+        # Output
+        num_prints = int(self.totalT / self.print_dt)
+        
+        self.fields = [str(i) + '_years' for i in range(0,int(self.totalT)+1,int(self.print_dt))]
 
+        dtype = [(i, float) for i in self.fields]
+        self.print_x = np.empty((len(self.x),), dtype = dtype)
+        self.print_eta = np.empty((len(self.x),), dtype = dtype)
+        self.print_H = np.empty((len(self.x),), dtype = dtype)
+        self.print_tau = np.empty((len(self.x),), dtype = dtype)
+        self.print_qb = np.empty((len(self.x),), dtype = dtype)
 
+    @property
+    def bed_elevation(self):
+        return self.eta
+    
+    @property
+    def water_surface_elevation(self):
+        return self.eta + self.H
+    
+    @property
+    def slope(self):
+        return self.Sl
+        
+    @property
+    def bed_shear_stress(self):
+        return self.tau
+        
+    @property
+    def distance(self):
+        return self.x
 
 
     def calculate_ambient_equilibria(self):
@@ -198,7 +235,39 @@ class AgDegNormalSub(object):
 
             self.advance_one_timestep()
 
-            if (t)%2 == 0:
-                print t
-                plt.plot(self.x, self.eta)
-                plt.show()
+            if t % self.print_dt == 0:
+                
+                self.record_output(t)
+                
+                
+                
+    def record_output(self, t):
+        
+        ind = self.fields[int(t / self.print_dt)]
+        
+        self.print_x[ind] = self.x
+        self.print_eta[ind] = self.eta
+        self.print_H[ind] = self.H
+        self.print_tau[ind] = self.tau
+        self.print_qb[ind] = self.qb
+        
+    def finalize(self):
+        
+        if self.save_output:
+        
+            header = ', '.join(['x','eta','H','tau','qb'])
+
+            for i in range(len(self.fields)):
+
+                self.data = np.zeros((len(self.x),5))
+                self.data[:,0] = self.print_x[self.fields[i]]
+                self.data[:,1] = self.print_eta[self.fields[i]]
+                self.data[:,2] = self.print_H[self.fields[i]]
+                self.data[:,3] = self.print_tau[self.fields[i]]
+                self.data[:,4] = self.print_qb[self.fields[i]]
+
+                np.savetxt('output/AgDegSub_' + self.fields[i] + '.csv', self.data,
+                               header = header,
+                               delimiter = ",",
+                               fmt = '%10.8f',
+                               comments = '')
