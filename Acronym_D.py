@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+import json
 
 import GSD_calculator as gsd
 
@@ -21,7 +21,6 @@ default_flow = [(80,0),
 
 class Acronym_D(Acronym.Acronym):
 
-
     def __init__(self,
                  GSD = default_GSD,
                  flow_curve = default_flow,
@@ -30,8 +29,12 @@ class Acronym_D(Acronym.Acronym):
                  mannings_n = 2.,
                  rho_s = 2650.,
                  rho_w = 1000.,
-                 alpha_r = 8.1):
+                 alpha_r = 8.1,
+                 verbose = False,
+                 save_output = True):
 
+        self.verbose = verbose
+        self.save_output = save_output
         
         self.GSD = GSD
         self.flow_edges = flow_curve
@@ -225,3 +228,61 @@ class Acronym_D(Acronym.Acronym):
         ustar = sqrt(self.g * H * self.channel_slope * (1 - (H / self.channel_width)))
         
         return ustar, H
+    
+    
+    
+    def finalize(self):
+        
+        if self.save_output:
+
+            surface_dict = {
+
+                'Geometric_mean' : self.surface_statistics['Dg'],
+                'Standard_Deviation' : self.surface_statistics['sigma'],
+                'Geometric_Standard_Deviation' : self.surface_statistics['sigma_g'],
+                'D_30' : self.characteristic_size['surface'][0],
+                'D_50' : self.characteristic_size['surface'][1],
+                'D_70' : self.characteristic_size['surface'][2],
+                'D_90' : self.characteristic_size['surface'][3]
+
+                }
+
+            bedload_dict = {
+
+                'Geometric_mean' : self.bedload_statistics['Dg'],
+                'Standard_Deviation' : self.bedload_statistics['sigma'],
+                'Geometric_Standard_Deviation' : self.bedload_statistics['sigma_g'],
+                'D_30' : self.characteristic_size['bedload'][0],
+                'D_50' : self.characteristic_size['bedload'][1],
+                'D_70' : self.characteristic_size['bedload'][2],
+                'D_90' : self.characteristic_size['bedload'][3]
+
+                }
+            
+            flow_dict = [dict(zip(self.averages.dtype.names, r)) for r in self.averages][0]
+            p_finer_dict = [dict(zip(list(self.percent_finer['diameter']), flow_dict['percent_finer']))]
+            flow_dict['percent_finer'] = p_finer_dict
+
+
+            stats_output = {
+
+                'Surface' : surface_dict,
+                'Bedload' : bedload_dict,
+                'Averages': flow_dict
+
+                }
+
+            with open('output/AcronymD_stats.json', 'w') as f:
+                    json.dump(stats_output, f, indent=4)
+        
+        
+            fields = ['GrainSize', 'PercentFiner_Surface', 'PercentFiner_Bedload']
+
+            header = ', '.join(fields)
+
+            np.savetxt('output/AcronymD_PercentFiner.csv', self.percent_finer,
+                       header = header,
+                       delimiter = ",",
+                       fmt = '%10.5f',
+                       comments = '')
+        

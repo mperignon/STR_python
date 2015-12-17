@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+import json
 
 import GSD_calculator as gsd
 
@@ -25,8 +25,13 @@ class Acronym(object):
                  GSD = default_GSD,
                  ustar = 0.1,
                  rho_s = 2650.,
-                 rho_w = 1000.):
+                 rho_w = 1000.,
+                 verbose = False,
+                 save_output = True):
 
+        
+        self.verbose = verbose
+        self.save_output = save_output
         
         self.ustar = float(ustar)
         self.GSD = GSD
@@ -356,3 +361,55 @@ class Acronym(object):
 
         return out_array
 
+
+    
+    def finalize(self):
+        
+        if self.save_output:
+
+            surface_dict = {
+
+                'Geometric_mean' : self.surface_statistics['Dg'],
+                'Standard_Deviation' : self.surface_statistics['sigma'],
+                'Geometric_Standard_Deviation' : self.surface_statistics['sigma_g'],
+                'D_30' : self.characteristic_size['surface'][0],
+                'D_50' : self.characteristic_size['surface'][1],
+                'D_70' : self.characteristic_size['surface'][2],
+                'D_90' : self.characteristic_size['surface'][3]
+
+                }
+
+            bedload_dict = {
+
+                'Geometric_mean' : self.bedload_statistics['Dg'],
+                'Standard_Deviation' : self.bedload_statistics['sigma'],
+                'Geometric_Standard_Deviation' : self.bedload_statistics['sigma_g'],
+                'D_30' : self.characteristic_size['bedload'][0],
+                'D_50' : self.characteristic_size['bedload'][1],
+                'D_70' : self.characteristic_size['bedload'][2],
+                'D_90' : self.characteristic_size['bedload'][3]
+
+                }
+
+
+            stats_output = {
+
+                'Surface' : surface_dict,
+                'Bedload' : bedload_dict
+
+                }
+
+            with open('output/Acronym_stats.json', 'w') as f:
+                    json.dump(stats_output, f, indent=4)
+        
+        
+            fields = ['GrainSize', 'PercentFiner_Surface', 'PercentFiner_Bedload']
+
+            header = ', '.join(fields)
+
+            np.savetxt('output/Acronym_PercentFiner.csv', self.percent_finer,
+                       header = header,
+                       delimiter = ",",
+                       fmt = '%10.5f',
+                       comments = '')
+        
