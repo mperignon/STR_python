@@ -1,6 +1,5 @@
 from math import sqrt
 import numpy as np
-import matplotlib.pyplot as plt
 
 import shared_tools as tools
 
@@ -28,10 +27,15 @@ class AgDegBW(object):
                  alpha_u = 1,
                  dt = 0.1,
                  totalT = 120,
+                 print_dt = 20,
                  g = 9.81,
                  rho_w = 1000,
-                 rho_s = 2650):
+                 rho_s = 2650,
+                 verbose = False,
+                 save_output = True):
     
+        self.verbose = verbose
+        self.save_output = save_output
     
         self._qw = float(Qf) / float(B)
 
@@ -55,6 +59,7 @@ class AgDegBW(object):
 
         self._dt = float(dt) # years
         self._totalT = float(totalT)
+        self.print_dt = float(print_dt)
 
         self._alpha_u = float(alpha_u) # upwind coefficient [1=full upwind, 0.5=central difference]
         self._phi = float(phi) # boundary shear stress due to skin friction (phi <= 1)
@@ -83,6 +88,21 @@ class AgDegBW(object):
         self._qb = np.zeros_like(self._x)
         self._tau = np.zeros_like(self._x)
         self._Ht = np.zeros_like(self._x)
+        
+        
+        # Output
+        num_prints = int(self._totalT / self.print_dt)
+        
+        self.fields = [str(i) + '_years' for i in range(0,int(self._totalT)+1,int(self.print_dt))]
+
+        dtype = [(i, float) for i in self.fields]
+        self.print_x = np.empty((len(self._x),), dtype = dtype)
+        self.print_eta = np.empty((len(self._x),), dtype = dtype)
+        self.print_H = np.empty((len(self._x),), dtype = dtype)
+        self.print_ksi = np.empty((len(self._x),), dtype = dtype)
+        self.print_tau = np.empty((len(self._x),), dtype = dtype)
+        self.print_qb = np.empty((len(self._x),), dtype = dtype)
+        
         
         
     @property
@@ -178,8 +198,8 @@ class AgDegBW(object):
                                             left_boundary = _qtf)
         
         
-        self._eta = self._eta + \
-            (self._dt * self._sec_to_year / (1-self._porosity)) * self._If * self._dq
+        self._eta = (self._eta + 
+            (self._dt * self._sec_to_year / (1-self._porosity)) * self._If * self._dq)
 
 
 
@@ -194,9 +214,46 @@ class AgDegBW(object):
             self.advance_one_timestep()
             self.Backwater_calculator()
             
-
-            if (t%1)==0:
-                print t
+            if t % self.print_dt == 0:
                 
-                plt.plot(self._x, self._ksi, self._x, self._eta)
-                plt.show()
+                self.record_output(t)
+                
+                
+                
+    def record_output(self, t):
+        
+        ind = self.fields[int(t / self.print_dt)]
+        
+        self.print_x[ind] = self._x
+        self.print_eta[ind] = self._eta
+        self.print_H[ind] = self._H
+        self.print_ksi[ind] = self._ksi
+        self.print_tau[ind] = self._tau
+        self.print_qb[ind] = self._qb
+        
+        
+            
+    def finalize(self):
+        
+        if self.save_output:
+        
+            header = ', '.join(['x','eta','H','ksi','tau','qb'])
+
+            for i in range(len(self.fields)):
+
+                self.data = np.zeros((len(self._x),6))
+                self.data[:,0] = self.print_x[self.fields[i]]
+                self.data[:,1] = self.print_eta[self.fields[i]]
+                self.data[:,2] = self.print_H[self.fields[i]]
+                self.data[:,3] = self.print_ksi[self.fields[i]]
+                self.data[:,4] = self.print_tau[self.fields[i]]
+                self.data[:,5] = self.print_qb[self.fields[i]]
+
+                np.savetxt('output/AgDegBW_' + self.fields[i] + '.csv', self.data,
+                               header = header,
+                               delimiter = ",",
+                               fmt = '%10.8f',
+                               comments = '')
+        
+        
+            
