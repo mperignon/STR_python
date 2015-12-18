@@ -124,7 +124,7 @@ class DeltaNorm(object):
 
     def run(self):
 
-        for j in range(self.num_iterations):
+        for j in range(self.num_iterations+1):
 
             time = self.dt * j * self.sec_to_year
 

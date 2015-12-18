@@ -41,9 +41,16 @@
         "bed_elev_foreset_base__etabottom": 0.0, 
         "bed_length__sbb": 62092.477267957009
     }, 
+    "15.0_years": {
+        "bed_elev_foreset_top__etatop": 3.3616136025005923, 
+        "bed_elev_upstream__etaup": 24.881929216147281, 
+        "domain_length__sss": 69794.466637461141, 
+        "bed_elev_foreset_base__etabottom": 0.0, 
+        "bed_length__sbb": 69811.274705473857
+    }, 
     "mass_balance": {
-        "sed_volume_final": 525101.07880578481, 
-        "mass_balance_error": 0.048368932822510417, 
+        "sed_volume_final": 525117.92485083628, 
+        "mass_balance_error": 0.048399461621988368, 
         "sed_volume_total_feed": 473364.00000000006, 
         "sed_volume_initial": 26338.5
     }

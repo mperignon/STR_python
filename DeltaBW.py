@@ -134,7 +134,7 @@ class DeltaBW(object):
         
         self.compute_normal_flow()
 
-        for j in range(self.num_iterations):
+        for j in range(self.num_iterations+1):
 
             time = self.dt * j * self.sec_to_year
 
