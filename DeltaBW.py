@@ -15,6 +15,23 @@ class UnsortableOrderedDict(OrderedDict):
 
 
 class DeltaBW(object):
+    """
+    DeltaBW (1DDeltaBW)
+
+    Python version of Gary Parker's 1D Sediment Transport Morphodynamics e-book,
+    originally in Visual Basic and converted to C by Andrew Leman (2009)
+    
+
+    MC Perignon
+    Nov 2015
+
+    ----------------------------------------------
+
+    Computes the evolution of the long profile of a river ending in a 1D
+    migrating delta using a backwater formulation
+
+    """
+
     
     def __init__(self,
                 friction = "Chezy",

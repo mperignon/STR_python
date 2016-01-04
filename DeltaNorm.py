@@ -14,7 +14,23 @@ class UnsortableOrderedDict(OrderedDict):
         return UnsortableList(OrderedDict.items(self, *args, **kwargs))
 
 class DeltaNorm(object):
+    """
+    DeltaNorm (1DDeltaNorm)
+
+    Python version of Gary Parker's 1D Sediment Transport Morphodynamics e-book,
+    originally in Visual Basic and converted to C by Andrew Leman (2009)
     
+
+    MC Perignon
+    Nov 2015
+
+    ----------------------------------------------
+
+    Computes the evolution of the long profile of a river ending in a 1D
+    migrating delta using a normal flow approximation
+
+    """
+        
     def __init__(self,
                 friction = "Chezy",
                 flood_discharge = 6.,

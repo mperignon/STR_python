@@ -20,6 +20,42 @@ default_flow = [(80,0),
                 (10, 100)]
 
 class Acronym_D(Acronym.Acronym):
+    """
+    Acronym_D
+    (uses Acronym)
+
+    Python version of Gary Parker's 1D Sediment Transport Morphodynamics e-book,
+    originally in Visual Basic and converted to C by Andrew Leman (2009)
+    
+    Performs the same calculations of AcronymD
+
+    MC Perignon
+    Nov 2015
+
+    ----------------------------------------------
+
+    Implements the Parker (1990) surface-based bedload transport relation
+    to compute average gravel bedload transport rates in response to a given
+    flow duration curve.
+
+    ----------------------------------------------
+    
+    Input:
+    ------
+    GSD: list of tuples of bound diameters (in mm) and percent finer
+    [(diameter, fraction), (diameter, fraction), ...]
+    
+    default_flow: list of tuples of flow discharge (in m3/s) and
+    the percentage of time the discharge is exceeded
+    [(discharge, percent exceeded), (discharge, percent exceeded), ...]
+    
+    
+    Output:
+    -------
+    json file of grain size distribution statistics for surface and bedload
+    csv file of grain size distributions of surface and bedload
+
+    """
 
     def __init__(self,
                  GSD = default_GSD,

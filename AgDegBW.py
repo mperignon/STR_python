@@ -4,13 +4,30 @@ import numpy as np
 import shared_tools as tools
 
 class AgDegBW(object):
+    """
+    AgDegBW
+
+    Python version of Gary Parker's 1D Sediment Transport Morphodynamics e-book,
+    originally in Visual Basic and converted to C by Andrew Leman (2009)
+
+    MC Perignon
+    Nov 2015
+
+    ----------------------------------------------
+
+    Computes the evolution of river bed level in response to an upstream
+    sediment feed rate and flood discharge frequency in a backwater environment.
+    Modifying the feed rate and downstream water surface elevation can force the
+    river to aggrade or degrade to a new equilibrium.
+
+    """
     
     def __init__(self,
                  friction = "Manning",
                  Qf = 400,
                  If = 0.1,
                  S = 0.0002,
-                 initdepth = 15,
+                 downstream_depth = 15,
                  B = 60,
                  L = 50000,
                  dx = 833,
@@ -40,7 +57,7 @@ class AgDegBW(object):
         self._qw = float(Qf) / float(B)
 
         self._friction = friction
-        self._initdepth = initdepth
+        self._initdepth = downstream_depth
 
         self._Qf = float(Qf) # characteristic flood discharge
         self._If = float(If) # flood intermittency

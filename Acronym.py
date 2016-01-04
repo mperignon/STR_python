@@ -19,7 +19,48 @@ default_GSD = [(40,100),
 
 
 class Acronym(object):
+    """
+    Acronym
 
+    Python version of Gary Parker's 1D Sediment Transport Morphodynamics e-book,
+    originally in Visual Basic and converted to C by Andrew Leman (2009)
+    
+    Performs the same calculations of both Acronym1 and AcronymR
+
+    MC Perignon
+    Nov 2015
+
+    ----------------------------------------------
+
+    Implements the Parker (1990) surface-based bedload transport relation
+    to compute gravel bedload transport rates. The gravel is divided into N
+    grain size ranges bounded by N+1 sizes Db,i, i = 1 to N+1.  The grain size
+    distribution of the surface (active) layer of the bed is specified in terms
+    of the N+1 pairs (Db,i, Ff,i), i = 1..N+1, where Ff,i denotes the percent
+    finer in the surface layer.
+    
+    The finest size must equal or exceed 2 mm. That is, the sand must be removed
+    from the surface size distribution and the fractions appropriately renormalized
+    in determining the surface grain size distribution to be input into Acronym.
+
+    ----------------------------------------------
+    
+    Input:
+    ------
+    GSD: list of tuples of bound diameters (in mm) and percent finer
+    [(diameter, fraction), (diameter, fraction), ...]
+    
+    If there are no lower and upper bounds in the inputted distribution such that
+    the percent finer are equal to 0 and 1 (or 0 and 100), compute these bounds
+    with a linear interpolation in the phi scale.
+    
+    
+    Output:
+    -------
+    json file of grain size distribution statistics for surface and bedload
+    csv file of grain size distributions of surface and bedload
+
+    """
 
     def __init__(self,
                  GSD = default_GSD,
@@ -49,6 +90,7 @@ class Acronym(object):
 
 
     def run(self):
+        """ Performs calculations"""
 
         self.GSD_edges, self.GSD_surface = self.process_surface_GSD(self.GSD)
 
@@ -96,11 +138,19 @@ class Acronym(object):
         
     @property
     def grain_size_distribution(self):
+        """Surface grain diameters (mm) and percent finer"""
         
         return self.GSD
     
     @grain_size_distribution.setter
     def grain_size_distribution(self, new_GSD):
+        """
+        Set the surface grain diameters (mm) and percent finer
+        
+        Parameters
+        ----------
+        new_GSD: list of tuples of bound diameters (in mm) and percent finer
+        """
         
         self.GSD = new_GSD
         
@@ -108,6 +158,10 @@ class Acronym(object):
 
     @property
     def percent_finer(self):
+        """
+        Array of grain bound diameters (mm) and percent finer
+        for surface and bedload
+        """
         
         titles = ('diameter', 'surface', 'bedload')
         data = (self.GSD_edges['diameters'], self.pf_surface, self.pf_bedload)
@@ -118,6 +172,9 @@ class Acronym(object):
     
     @property
     def characteristic_size(self):
+        """
+        Grain size at 30, 50, 70, and 90 percentile for surface and bedload
+        """
         
         if len(self.GSD_edges) > 2:
             titles = ('percentile', 'surface', 'bedload')
@@ -129,6 +186,9 @@ class Acronym(object):
     
     @property
     def surface_statistics(self):
+        """
+        Statistics of grain size distribution for the surface
+        """
         
         self._surface_statistics = {'Dg': self.D_g_surface,
                                    'sigma': self.sigma_surface,
@@ -139,6 +199,9 @@ class Acronym(object):
     
     @property
     def bedload_statistics(self):
+        """
+        Statistics of grain size distribution for the surface
+        """
         
         self._bedload_statistics = {'Dg': self.D_g_bedload,
                                    'sigma': self.sigma_bedload,
@@ -149,11 +212,18 @@ class Acronym(object):
     
     @property
     def Shields_stress(self):
+        """
+        Shield's stress for grain size distribution of the surface
+        """
         
         return self.tau_star_surface
             
 
     def get_bedload_discharge(self, GSD, Omega, phi_star, D_g, ustar):
+        """
+        Calculates the volumetric bedload discharge for each grain size
+        range and total
+        """
 
         if len(GSD) == 1:
 
@@ -178,6 +248,9 @@ class Acronym(object):
 
 
     def get_Omega(self, phi_star, sigma):
+        '''
+        Internal function
+        '''
 
         if phi_star > po[-2]:    
             omega_o = oo[-2] + ((oo[-1] - oo[-2])/(po[-1] - po[-2])) * (phi_star - po[-2])
@@ -221,6 +294,9 @@ class Acronym(object):
 
 
     def grain_statistics(self, GSD, centerpts, pf):
+        '''
+        Calculates the statistics of a grain size distribution
+        '''
         
         fractions = np.diff(pf) / 100
 
@@ -257,6 +333,9 @@ class Acronym(object):
 
 
     def GG(self, phi):
+        '''
+        Internal function
+        '''
 
         Mo = 14.2
 
@@ -272,6 +351,9 @@ class Acronym(object):
 
 
     def create_center_array_from_GSD_edges(self, datapts):
+        '''
+        Calculates the centerpoint values for the grain size distribution
+        '''
 
         psi_b = [log(i,2) for i in datapts['diameters']]
         
@@ -292,6 +374,9 @@ class Acronym(object):
 
 
     def get_percent_finer(self, GSD):
+        '''
+        Calculates percent finer from a grain size distribution
+        '''
 
         # percent finer
         pf = np.zeros((len(GSD)+1,))
@@ -304,6 +389,9 @@ class Acronym(object):
 
 
     def calculate_bedload(self, GSD, D_g, sigma, ustar):
+        '''
+        Calculates grain size distribution of bedload
+        '''
         
         taursgo = 0.0386
         lowphi = 0.1
@@ -333,6 +421,9 @@ class Acronym(object):
 
 
     def process_surface_GSD(self, GSD):
+        '''
+        Internal function
+        '''
 
         assert len(GSD) >= 2, 'Too few grain sizes. At least two size bounds required.'
 
@@ -351,6 +442,9 @@ class Acronym(object):
 
 
     def create_output_array(self, titles, data):
+        '''
+        Internal function
+        '''
 
         dtype = [(titles[0], float), (titles[1], float), (titles[2], float)]
         out_array = np.zeros((len(data[0])), dtype=dtype)
@@ -364,6 +458,9 @@ class Acronym(object):
 
     
     def finalize(self):
+        '''
+        Creates output files
+        '''
         
         if self.save_output:
 

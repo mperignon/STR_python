@@ -3,7 +3,24 @@ import json
 from math import pow, exp, log, sqrt
 
 class BackwaterWrightParker(object):
-    
+    """
+    BackwaterWrightParker
+
+    Python version of Gary Parker's 1D Sediment Transport Morphodynamics e-book,
+    originally in Visual Basic and converted to C by Andrew Leman (2009)
+
+    MC Perignon
+    Dec 2015
+
+    ----------------------------------------------
+
+    Calculates backwater curves in sand-bed streams, including the effects of 
+    both skin friction and form drag due to skin friction. Uses the hydraulic
+    resistance formulation of Wright and Parker (2004) without the flow
+    stratification correction
+
+    """
+        
     def __init__(self,
                  total_discharge = 1800.,
                  channel_width = 275.,

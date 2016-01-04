@@ -2,6 +2,23 @@ from math import sqrt
 import numpy as np
 
 class AgDegNormal(object):
+    """
+    AgDegNormal
+
+    Python version of Gary Parker's 1D Sediment Transport Morphodynamics e-book,
+    originally in Visual Basic and converted to C by Andrew Leman (2009)
+
+    MC Perignon
+    Nov 2015
+
+    ----------------------------------------------
+
+    Computes the evolution of river bed level in response to an upstream
+    sediment feed rate and flood discharge frequency under normal flow.
+    The downstream bed elevation is assumed to be fixed. Modifying the feed rate
+    can force the river to aggrade or degrade to a new equilibrium.
+
+    """
     
     def __init__(self,
                  friction = 'Manning',

@@ -4,6 +4,10 @@ import json
 
 
 def pre_process_data(datapoints):
+    '''
+    Processes a grain size distribution (diameters and mm and fractions) for 
+    calculating bedload grain size distributions
+    '''
 
     dtype = [('diameters', float), ('fractions', float)]
     datapts = np.array(datapoints, dtype=dtype)
@@ -102,13 +106,19 @@ class GSD_calculator(object):
     standard deviation and characteristic diameters based on percent finer.
 
     ----------------------------------------------
+    
     Input:
+    ------
     datapoints: list of tuples of bound diameters (in mm) and percent finer
     [(diameter, fraction), (diameter, fraction), ...]
     
     If there are no lower and upper bounds in the inputted distribution such that
     the percent finer are equal to 0 and 1 (or 0 and 100), compute these bounds
     with a linear interpolation in the phi scale.
+    
+    Output:
+    -------
+    json file of grain size distribution statistics
 
     """
     
@@ -167,6 +177,9 @@ class GSD_calculator(object):
         
          
     def run(self):
+        '''
+        Performs calculations
+        '''
         
         self._datapts = pre_process_data(self._datapoints)
         self._D_g, self._sigma_g = grain_statistics(self._datapts)
@@ -175,6 +188,9 @@ class GSD_calculator(object):
         
             
     def finalize(self):
+        '''
+        Creates output files
+        '''
     
         sorting = 'Well sorted'
         if self._sigma_g >= 1.6:
@@ -201,52 +217,7 @@ class GSD_calculator(object):
             
             with open('output/GSD_calculator_stats.json', 'w') as f:
                 json.dump(output_dict, f, indent=4, sort_keys=True)
-        
-        
     
-    
-    def pre_process_data(self, datapoints):
-    
-        dtype = [('diameters', float), ('fractions', float)]
-        datapts = np.array(datapoints, dtype=dtype)
-
-        # scale
-        if max(datapts['fractions']) > 1.:
-            datapts['fractions'] = datapts['fractions'] / 100.
-
-        # sort
-        datapts = np.sort(datapts, order='diameters')       
-
-        # interpolate
-        if datapts['fractions'][0] > 0.0:
-
-            # if smallest fraction is not zero, interpolate linearly
-            # to find the missing value
-    
-            D3 = log(datapts['diameters'][1],2)
-            D2 = log(datapts['diameters'][0],2)
-            f3 = datapts['fractions'][1]
-            f2 = datapts['fractions'][0]
-            newpsi = D3 + ((D2 - D3)/(f2 - f3))*(0-f3)
-            first_entry = np.array((2**newpsi,0), dtype=dtype)
-            datapts = np.hstack((first_entry, datapts))
-    
-        if datapts['fractions'][-1] < 1.0:
-
-            # if largest fraction is not zero, assume that the next larger
-            # psi scale grain size had a fraction of 1
-    
-            psi_scale = np.array(range(-10,20), dtype = np.float)
-            psi_scale_mm = 2**psi_scale
-    
-            next_larger_size = \
-                psi_scale_mm[ np.where(psi_scale_mm > \
-                    datapts['diameters'][-1])[0][0]]
-                
-            last_entry = np.array([(next_larger_size, 1.0)], dtype = dtype)
-            datapts = np.hstack((datapts, last_entry))
-            
-        return datapts 
     
 
     def characteristic_size(self, pct = None):

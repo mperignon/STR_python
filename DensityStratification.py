@@ -3,6 +3,22 @@ from math import sqrt, log, exp, log10, pow
 import json
 
 class DensityStratification(object):
+    """
+    DensityStratification (SuspSedDensityStrat)
+
+    Python version of Gary Parker's 1D Sediment Transport Morphodynamics e-book,
+    originally in Visual Basic and converted to C by Andrew Leman (2009)
+    
+
+    MC Perignon
+    Nov 2015
+
+    ----------------------------------------------
+
+    Computes the effects of density stratification on the vertical profiles of
+    velocity and suspended sediment
+
+    """
     
     def __init__(self,
                  grain_size = 0.1,

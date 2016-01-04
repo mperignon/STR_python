@@ -3,6 +3,22 @@ from math import sqrt
 import json
 
 class Backwater(object):
+    """
+    Backwater
+
+    Python version of Gary Parker's 1D Sediment Transport Morphodynamics e-book,
+    originally in Visual Basic and converted to C by Andrew Leman (2009)
+
+    MC Perignon
+    Oct 2015
+
+    ----------------------------------------------
+
+    Computes the water surface elevation along the length of a channel with a
+    backwater at the downstream end in open channel flow
+
+    """
+
     
     def __init__(self,
                  friction = "Chezy",

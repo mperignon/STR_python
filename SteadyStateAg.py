@@ -5,6 +5,22 @@ import matplotlib.pyplot as plt
 import shared_tools as tools
 
 class SteadyStateAg(object):
+    """
+    SteadyStateAg
+
+    Python version of Gary Parker's 1D Sediment Transport Morphodynamics e-book,
+    originally in Visual Basic and converted to C by Andrew Leman (2009)
+    
+
+    MC Perignon
+    Nov 2015
+
+    ----------------------------------------------
+
+    Computes the steady-state aggradation of a sand-bed river in response to sea
+    level rise at a constant rate
+
+    """
     
     def __init__(self,
                  time = 10000.,
