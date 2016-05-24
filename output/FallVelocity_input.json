@@ -1,0 +1,7 @@
+{
+    "Gravitational_acceleration": 9.81, 
+    "Grain_size_mm": 0.2, 
+    "Kinematic_viscosity": 1e-06, 
+    "Density_of_sediment": 2650.0, 
+    "Density_of_fluid": 1000.0
+}

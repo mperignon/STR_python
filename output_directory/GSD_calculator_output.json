@@ -1,8 +1,8 @@
 {
+    "Sorting": "Poorly sorted", 
+    "Standard_deviation": 2.024050246898636, 
     "D_30": 0.3110334335652909, 
     "D_50": 0.51057916255949753, 
-    "D_70": 0.78290275531242759, 
     "Geometric_mean": 0.49767617511617934, 
-    "Sorting": "Poorly sorted", 
-    "Standard_deviation": 2.024050246898636
+    "D_70": 0.78290275531242759
 }

@@ -8,11 +8,10 @@ class test_GSD_calculator(unittest.TestCase):
         datapts = [(4, 100), (2, 99), (1, 97), (0.5, 83.4), 
                (0.25, 42), (0.125, 10), (0.062, 3.2), (0.031, 2)]
     
-        f = GSD_calculator(datapts = datapts,
-                           save_output = False)
+        f = GSD_calculator(datapts = datapts)
         f.run()
         
-        self.assertEqual(f.datapoints[0][0], 0.0097643881366852696)
+        self.assertEqual(f.datapts[0][0], 0.0097643881366852696)
         
     def test_geometric_mean(self):
     
@@ -20,8 +19,7 @@ class test_GSD_calculator(unittest.TestCase):
                (0.25, 42), (0.125, 10), (0.062, 3.2), (0.031, 2)]
     
         
-        f = GSD_calculator(datapts = datapts,
-                           save_output = False)
+        f = GSD_calculator(datapts = datapts)
         f.run()
         
         self.assertEqual(f.geometric_mean, 0.2729234998323391)
@@ -32,11 +30,10 @@ class test_GSD_calculator(unittest.TestCase):
                (0.25, 42), (0.125, 10), (0.062, 3.2), (0.031, 2)]
     
         
-        f = GSD_calculator(datapts = datapts,
-                           save_output = False)
+        f = GSD_calculator(datapts = datapts)
         f.run()
         
-        self.assertEqual(f.std, 2.1681747768957598)
+        self.assertEqual(f.standard_deviation, 2.1681747768957598)
         
         
     def test_grain_statistics(self):
@@ -45,8 +42,7 @@ class test_GSD_calculator(unittest.TestCase):
                (0.25, 42), (0.125, 10), (0.062, 3.2), (0.031, 2)]
     
         
-        f = GSD_calculator(datapts = datapts,
-                           save_output = False)
+        f = GSD_calculator(datapts = datapts)
         f.run()
         grain_stats = f.characteristic_size([70,50,30])
         

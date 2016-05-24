@@ -1,5 +1,5 @@
 from math import sqrt, log10, pow
-import json
+import json, os
         
 
 class FallVelocity(object):
@@ -45,32 +45,38 @@ class FallVelocity(object):
     """
 
     
-    def __init__(self, D = 0.1, nu=1e-6, g=9.81, rho_w=1000., rho_s=2650., verbose=False, save_output=True):
+    def __init__(self, D = 0.1, nu=1e-6, g=9.81, rho_w=1000., rho_s=2650., verbose=False):
         
-        self._verbose = verbose
-        self.save_output = save_output
-        if self._verbose:
-            print 'Initializing FallVelocity...'
+        self.verbose = verbose
+        if self.verbose:
+            print 'Initializing FallVelocity...\n'
         
-        self._nu = float(nu)
-        self._g = float(g)
-        self._rho_w = float(rho_w)
-        self._rho_s = float(rho_s)
-        
-        self._R = (self._rho_s - self._rho_w) / self._rho_w
+        self.nu = float(nu)
+        self.g = float(g)
+        self.rho_w = float(rho_w)
+        self.rho_s = float(rho_s)
         
         self._grain_size = D / 1000.
         
+        if self.verbose:
+            print 'Default values set!'
+            print '-' * 20
+            print 'Grain size:', self.grain_size, 'mm'
+            print 'Kinematic viscosity:', self.nu, 'm^2/s'
+            print 'Graviatational acceleration:', self.g, 'm/s^2'
+            print 'Density of fluid:', self.rho_w, 'Kg/m^3'
+            print 'Density of sediment:', self.rho_s, 'Kg/m^3'
+        
         # Outputs
-        self._vs = None
-        self._Re = None
-        self._Rf = None
+        self.vs = None
+        self.Re = None
+        self.Rf = None
         
 
     @property
     def grain_size(self):
         """Grain size in mm."""
-        return self._grain_size
+        return self._grain_size * 1000 # to report in mm
 
 
     @grain_size.setter
@@ -84,7 +90,7 @@ class FallVelocity(object):
         """
         self._grain_size = new_D / 1000.     # convert from mm to m
         
-        if self._verbose:
+        if self.verbose:
             print 'Grain size set'
             
     
@@ -92,56 +98,74 @@ class FallVelocity(object):
     def settling_velocity(self):
         """Settling velocity in m/s"""
         
-        assert self._vs, "A settling velocity has not been calculated "\
+        assert self.vs, "A settling velocity has not been calculated "\
                         "because FallVelocity has not been run."
-        return self._vs
+        return self.vs
     
     @property
     def Reynolds_number(self):
         
-        assert self._Re, "A Reynolds number has not been calculated "\
+        assert self.Re, "A Reynolds number has not been calculated "\
                         "because FallVelocity has not been run."
         
-        return self._Re
+        return self.Re
     
     @property
     def dimensionless_fall_velocity(self):
         
-        assert self._Rf, "A dimensionless fall velocity has not been calculated "\
+        assert self.Rf, "A dimensionless fall velocity has not been calculated "\
                         "because FallVelocity has not been run."
         
-        return self._Rf
+        return self.Rf
         
         
             
     def run(self):
     
-        assert self._grain_size, "Grain size must be set before running."
+        self.R = (self.rho_s - self.rho_w) / self.rho_w
         
-        self.calculate_Reynolds_number()     
+        self.calculateReynoldsnumber()     
         self.calculate_dimensionless_fall_velocity()                                       
         self.calculate_settling_velocity()
         
+        if self.verbose:
+            print 'Running FallVelocity...\n'
+            print 'Reynolds Number: %.4g' % self.Re
+            print 'Dimensionless fall velocity: %.4g' % self.Rf
+            print 'Settling velocity: %.4g m/s' % self.vs
+        
         
             
             
-    def finalize(self):
+    def finalize(self, dir = 'output'):
     
-        if self._verbose:
-            print 'Reynolds Number: %.4g' % self._Re
-            print 'Dimensionless fall velocity: %.4g' % self._Rf
-            print 'Settling velocity: %.4g m/s' % self._vs
+    	if not os.path.exists(dir):
+    		os.makedirs(dir)
+    
+        if self.verbose:
+            print 'Finalizing FallVelocity...\n'
+            print 'Saved input and output files.'
+
+        input_dict = {
+            'Grain_size_mm' : self.grain_size,
+            'Kinematic_viscosity' : self.nu,
+            'Gravitational_acceleration' : self.g,
+            'Density_of_fluid' : self.rho_w,
+            'Density_of_sediment' : self.rho_s
+        }
+        
+        with open(os.path.join(dir,'FallVelocity_input.json'), 'w') as f:
+            json.dump(input_dict, f, indent=4)
             
-        if self.save_output:
-            
-            output_dict = {
-                'Reynolds_number' : self._Re,
-                'Dimensionless_fall_velocity' : self._Rf,
-                'Settling_velocity' : self._vs
-            }
-            
-            with open('output/FallVelocity.json', 'w') as f:
-                json.dump(output_dict, f, indent=4)
+        output_dict = {
+            'Reynolds_number' : self.Re,
+            'Dimensionless_fall_velocity' : self.Rf,
+            'Settling_velocity' : self.vs
+        }
+        
+        with open(os.path.join(dir,'FallVelocity_output.json'), 'w') as f:
+            json.dump(output_dict, f, indent=4)
+
                 
             
             
@@ -149,28 +173,28 @@ class FallVelocity(object):
             
 
             
-    def calculate_Reynolds_number(self):
+    def calculateReynoldsnumber(self):
 
-        self._Re = sqrt(self._R * self._g * self._grain_size) * \
-                    self._grain_size / self._nu
+        self.Re = sqrt(self.R * self.g * self.grain_size) * \
+                    self.grain_size / self.nu
 
         failMessage  = "This equation is only valid for Reynolds numbers "\
                         "below 2.6e+06. The calculated Reynolds number for "\
-                        "this particle is %.2g" % self._Re
-        assert self._Re <= 2.6e6, failMessage       
+                        "this particle is %.2g" % self.Re
+        assert self.Re <= 2.6e6, failMessage       
   
   
         
     def calculate_dimensionless_fall_velocity(self):
         
-        x = log10(self._Re**2)
+        x = log10(self.Re**2)
         y = (-3.76715) + (1.92944*x) - (0.09815*x*x) - \
             (0.00575*x*x*x) + (0.00056*x*x*x*x)
         
-        self._Rf = pow(pow(10,y) / self._Re, 1./3)
+        self.Rf = pow(pow(10,y) / self.Re, 1./3)
 
 
         
     def calculate_settling_velocity(self):
         
-        self._vs = self._Rf * sqrt(self._R * self._g * self._grain_size)
+        self.vs = self.Rf * sqrt(self.R * self.g * self.grain_size)

@@ -59,30 +59,36 @@ class RouseVanoni_Equilibrium(object):
                  b = 0.05,
                  u_star = 0.2,
                  settling_velocity = 0.003,
-                 verbose = False,
-                 save_output = True):
+                 verbose = False):
         
-        self._verbose = verbose
-        if verbose:
+        self.verbose = verbose
+        if self.verbose:
             print 'Initializing RouseVanoni_Equilibrium...'
             
-        self._kappa = 0.4
+        self.kappa = 0.4
         
-        self._u = float(u_star)
-        self._b = float(b)
-        self._vs = float(settling_velocity)
+        self.u = float(u_star)
+        self.b = float(b)
+        self.vs = float(settling_velocity)
         
-        self._z = np.hstack((np.linspace(b,0.95,19), np.array([0.98,0.995,1.0])))
-        self._C = np.zeros_like(self._z)
-        self._profile = None
+        self.z = np.hstack((np.linspace(b,0.95,19), np.array([0.98,0.995,1.0])))
+        self.C = np.zeros_like(self.z)
+        self.profile = None
         
-        self.save_output = save_output
+             print 'Default values set!'
+            print '-' * 20
+            print 'Grain size:', self.grain_size, 'mm'
+            print 'Kinematic viscosity:', self.nu, 'm^2/s'
+            print 'Graviatational acceleration:', self.g, 'm/s^2'
+            print 'Density of fluid:', self.rho_w, 'Kg/m^3'
+            print 'Density of sediment:', self.rho_s, 'Kg/m^3'
+        
         
         
     @property
     def settling_velocity(self):
         """Settling velocity in m/s"""
-        return self._vs
+        return self.vs
 
 
     @settling_velocity.setter
@@ -94,44 +100,43 @@ class RouseVanoni_Equilibrium(object):
         new_vs : float
             New settling velocity in m/s.
         """
-        self._vs = new_vs
+        self.vs = new_vs
 
     @property
     def RV_profile(self):
         """Rouse-Vanoni Equilibrium profile"""
         
-        return self._profile
+        return self.profile
             
             
     def run(self):
         
-        power = ((1-self._z)/self._z) / ((1-self._b)/self._b)
-        self._C = np.power(power, self._vs/(self._kappa * self._u))
+        power = ((1-self.z)/self.z) / ((1-self.b)/self.b)
+        self.C = np.power(power, self.vs/(self.kappa * self.u))
         
-        self._profile = np.vstack([self._z, self._C]).T
+        self.profile = np.vstack([self.z, self.C]).T
             
             
             
     def finalize(self):
         
-        if self.save_output:
             
-            fields = ['z_over_H','C_over_Cb']
+        fields = ['z_over_H','C_over_Cb']
 
-            header = ', '.join(fields)
+        header = ', '.join(fields)
 
-            dtype = [(i, float) for i in fields]
-            self.data = np.empty(len(self._profile), dtype = dtype)
-            
-            profile = np.flipud(self._profile)
+        dtype = [(i, float) for i in fields]
+        self.data = np.empty(len(self.profile), dtype = dtype)
+        
+        profile = np.flipud(self.profile)
 
-            self.data['z_over_H'] = profile[:,0]
-            self.data['C_over_Cb'] = profile[:,1]
+        self.data['z_over_H'] = profile[:,0]
+        self.data['C_over_Cb'] = profile[:,1]
 
-            np.savetxt('output/RouseVanoni_profile.csv', self.data,
-                       header = header,
-                       delimiter = ",",
-                       fmt = '%10.5f',
-                       comments = '')
+        np.savetxt('output/RouseVanoni_profile.csv', self.data,
+                   header = header,
+                   delimiter = ",",
+                   fmt = '%10.5f',
+                   comments = '')
             
             

@@ -1,6 +1,6 @@
 from math import sqrt, log
 import numpy as np
-import json
+import json, os
 
 
 def pre_process_data(datapoints):
@@ -123,22 +123,26 @@ class GSD_calculator(object):
     """
     
     
-    def __init__(self, datapts = None, verbose = False, save_output = True):
+    def __init__(self, datapts = None, verbose = False):
         
-        self._verbose = verbose
+        self.verbose = verbose
         if verbose:
-            print 'Initializing RouseVanoni_Equilibrium...'
+            print 'Initializing GSD_calculator...'
             
         self._datapoints = datapts
         
         if not datapts:
             self._datapoints = [(4, 100), (2, 99), (1, 97), (0.5, 83.4), 
                              (0.25, 42), (0.125, 10), (0.062, 3.2), (0.031, 2)]
+        
+        if self.verbose:
+            print 'Default distribution set!'
+            print '-' * 20
+            print self._datapoints
             
-        self.save_output = save_output
 
-        self._D_g = None
-        self._sigma_g = None
+        self.D_g = None
+        self.sigma_g = None
 
 
 
@@ -147,7 +151,7 @@ class GSD_calculator(object):
     @property
     def datapoints(self):
         """Grain bound diameters (mm) and percent finer"""
-        return self._datapts
+        return self._datapoints
 
 
     @datapoints.setter
@@ -166,12 +170,12 @@ class GSD_calculator(object):
     @property
     def geometric_mean(self):
         """Geometric mean (mm) of grain size distribution"""
-        return self._D_g
+        return self.D_g
         
     @property
-    def std(self):
+    def standard_deviation(self):
         """Standard deviation (mm) of grain size distribution"""
-        return self._sigma_g           
+        return self.sigma_g           
         
         
         
@@ -181,42 +185,51 @@ class GSD_calculator(object):
         Performs calculations
         '''
         
-        self._datapts = pre_process_data(self._datapoints)
-        self._D_g, self._sigma_g = grain_statistics(self._datapts)
-        self.finalize()
+        self.datapts = pre_process_data(self._datapoints)
+        self.D_g, self.sigma_g = grain_statistics(self.datapts)
+        
+        self.sorting = 'Well sorted'
+        if self.sigma_g >= 1.6:
+            self.sorting = 'Poorly sorted'
+            
+        self.pct_passing = self.characteristic_size([70,50,30])
+            
+        if self.verbose:
+            print 'Running GSD_calculator:'
+            print 'Geometric mean:', self.D_g, 'mm'
+            print 'Standard deviation:', self.sigma_g, 'mm    [', self.sorting, ']'
         
         
             
-    def finalize(self):
-        '''
-        Creates output files
-        '''
+    def finalize(self, dir = 'output'):
     
-        sorting = 'Well sorted'
-        if self._sigma_g >= 1.6:
-            sorting = 'Poorly sorted'
-            
-        pct_passing = self.characteristic_size([70,50,30])
+    	if not os.path.exists(dir):
+    		os.makedirs(dir)
     
-        if self._verbose:
-            print 'The statistics of the grain size distribution are:'
-            print 'Geometric mean:', self._D_g, 'mm'
-            print 'Standard deviation:', self._sigma_g, 'mm    [', sorting, ']'
-            
+        if self.verbose:
+            print 'Finalizing GSD_Calculator...\n'
+            print 'Saved input and output files.'
+
+        input_dict = {
+            'Grain_size_distribution' : self.datapoints
+        }
         
-        if self.save_output:
+        with open(os.path.join(dir,'GSD_calculator_input.json'), 'w') as f:
+            json.dump(input_dict, f, indent=4)
+    
+        
             
-            output_dict = {
-                'Geometric_mean' : self._D_g,
-                'Standard_deviation' : self._sigma_g,
-                'Sorting' : sorting,
-                'D_70' : pct_passing[0],
-                'D_50' : pct_passing[1],
-                'D_30' : pct_passing[2],
-            }
-            
-            with open('output/GSD_calculator_stats.json', 'w') as f:
-                json.dump(output_dict, f, indent=4, sort_keys=True)
+        output_dict = {
+            'Geometric_mean' : self.D_g,
+            'Standard_deviation' : self.sigma_g,
+            'Sorting' : self.sorting,
+            'D_70' : self.pct_passing[0],
+            'D_50' : self.pct_passing[1],
+            'D_30' : self.pct_passing[2],
+        }
+        
+        with open(os.path.join(dir,'GSD_calculator_output.json'), 'w') as f:
+            json.dump(output_dict, f, indent=4)
     
     
 
@@ -247,7 +260,7 @@ class GSD_calculator(object):
         
         D_x = []
         
-        datapts = self._datapts
+        datapts = self.datapts
             
         for i in pct:
 

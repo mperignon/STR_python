@@ -39,7 +39,7 @@ class Backwater(object):
                  save_output = True):
         
 
-        self._verbose = verbose
+        self.verbose = verbose
         self.save_output = save_output
         
         self.friction = friction
@@ -191,16 +191,11 @@ class Backwater(object):
 
     def update_surface(self, i, FnH, FnHp):
 
-#         self.x[i] = self.x[i-1] - self.dx_
         self.H[i] = self.H[i-1] - (0.5 * (FnH + FnHp) * self.dx)
-#         self.eta[i] = self.eta[i-1] + (self.S_ * self.dx_)
-
 
     def Backwater_Calculator(self, Cf_fun):
 
-#         self.x[0] = self.total_x_
         self.H[0] = self.initdepth
-#         self.eta[0] = 0
         FnH, FnHp, Cf = self.update_vals_Fn(Cf_fun, 0)
         self.update_vals(0, Cf)
 
@@ -280,5 +275,5 @@ class Backwater(object):
                        fmt = '%10.5f',
                        comments = '')
 
-            if self._verbose:
+            if self.verbose:
                 print 'Saved data to file'
